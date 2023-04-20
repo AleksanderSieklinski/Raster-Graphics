@@ -20,26 +20,44 @@ void GUIMyFrame1::m_b_grayscale_click( wxCommandEvent& event )
 {
  // TO DO: Konwersja do skali szarosci 
     Img_Cpy=Img_Org.ConvertToGreyscale();
+    m_scrolledWindow->ClearBackground();
 }
 
 void GUIMyFrame1::m_b_blur_click( wxCommandEvent& event )
 {
  // TO DO: Rozmywanie obrazu (blur)
  Img_Cpy = Img_Org.Blur(5);
+ m_scrolledWindow->ClearBackground();
 }
 
 void GUIMyFrame1::m_b_mirror_click( wxCommandEvent& event )
 {
  // TO DO: Odbicie lustrzane
     Img_Cpy = Img_Org.Mirror();
+    m_scrolledWindow->ClearBackground();
 }
 
 void GUIMyFrame1::m_b_replace_click( wxCommandEvent& event )
 {
  // TO DO: Zamiana kolorow 
     Img_Cpy=Img_Org.Copy();
-    Img_Cpy.Replace(0, 0, 0, 255, 255, 255);
+    unsigned char* data = Img_Cpy.GetData();
+    int width = Img_Cpy.GetWidth();
+    int height = Img_Cpy.GetHeight();
 
+    for(int i=0; i<height; i++)
+    {
+        for(int j=0; j<width; j++)
+        {
+            if(data[3*(i*width+j)]>220)
+            {
+                data[3*(i*width+j)+2]=255;
+                data[3*(i*width+j)+1]=0;
+                data[3*(i*width+j)]=0;
+            }
+        }
+    }
+    m_scrolledWindow->ClearBackground();
 }
 
 void GUIMyFrame1::m_b_rescale_click( wxCommandEvent& event )
@@ -47,12 +65,14 @@ void GUIMyFrame1::m_b_rescale_click( wxCommandEvent& event )
  // TO DO: Zmiana rozmiarow do 320x240
     Img_Cpy=Img_Org.Copy();
     Img_Cpy.Rescale(320, 240);
+    m_scrolledWindow->ClearBackground();
 }
 
 void GUIMyFrame1::m_b_rotate_click( wxCommandEvent& event )
 {
  // TO DO: Obrot o 30 stopni
     Img_Cpy=Img_Org.Rotate(30*M_PI/180, wxPoint(Img_Org.GetWidth()/2, Img_Org.GetHeight()/2), true, NULL);
+    m_scrolledWindow->ClearBackground();
 }
 
 void GUIMyFrame1::m_b_rotate_hue_click( wxCommandEvent& event )
@@ -60,6 +80,7 @@ void GUIMyFrame1::m_b_rotate_hue_click( wxCommandEvent& event )
  // TO DO: Przesuniecie Hue o 180 stopni
     Img_Cpy=Img_Org.Copy();
     Img_Cpy.RotateHue(180.0/360.0);
+    m_scrolledWindow->ClearBackground();
 }
 
 void GUIMyFrame1::m_b_mask_click( wxCommandEvent& event )
@@ -67,6 +88,7 @@ void GUIMyFrame1::m_b_mask_click( wxCommandEvent& event )
  // TO DO: Ustawienie maski obrazu
     Img_Cpy=Img_Org.Copy();
     Img_Cpy.SetMaskFromImage(Img_Mask, 0, 0, 0);
+    m_scrolledWindow->ClearBackground();
 }
 
 void GUIMyFrame1::m_s_brightness_scroll( wxScrollEvent& event )
@@ -87,20 +109,6 @@ Contrast(m_s_contrast->GetValue() - 100);
 Repaint();
 }
 
-int xGradient(const wxImage& image, int x, int y)
-{
-    int xGradient = 0;
-    xGradient = image.GetRed(x - 1, y - 1)+image.GetRed(x + 0, y - 1)+image.GetRed(x + 1, y - 1)-image.GetRed(x - 1, y + 1)-image.GetRed(x + 0, y + 1)-image.GetRed(x + 1, y + 1);
-	return xGradient;
-}
-
-int yGradient(const wxImage& image, int x, int y)
-{
-    int yGradient = 0;
-    yGradient = image.GetRed(x - 1, y - 1)+image.GetRed(x + 0, y - 1)+image.GetRed(x + 1, y - 1)-image.GetRed(x - 1, y + 1)-image.GetRed(x + 0, y + 1)-image.GetRed(x + 1, y + 1);
-	return yGradient;
-}
-
 void GUIMyFrame1::m_b_prewitt_click( wxCommandEvent& event )
 {
  // TO DO: Pionowa maska Prewitta
@@ -114,8 +122,8 @@ void GUIMyFrame1::m_b_prewitt_click( wxCommandEvent& event )
     {
         for(int j=1; j<width-1; j++)
         {
-            int x = xGradient(Img_Cpy, j, i);
-            int y = yGradient(Img_Cpy, j, i);
+            int x = Img_Cpy.GetRed(j-1,i-1)+Img_Cpy.GetRed(j,i-1)+Img_Cpy.GetRed(j+1,i-1)-Img_Cpy.GetRed(j-1,i+1)-Img_Cpy.GetRed(j,i+1)-Img_Cpy.GetRed(j+1,i+1);
+            int y = Img_Cpy.GetRed(j-1,i-1)+Img_Cpy.GetRed(j,i-1)+Img_Cpy.GetRed(j+1,i-1)-Img_Cpy.GetRed(j-1,i+1)-Img_Cpy.GetRed(j,i+1)-Img_Cpy.GetRed(j+1,i+1);
             int value = sqrt(x*x + y*y);
             if(value>255) value=255;
             if(value<0) value=0;
@@ -123,6 +131,7 @@ void GUIMyFrame1::m_b_prewitt_click( wxCommandEvent& event )
         }
     }
     Img_Cpy = tmp;
+    m_scrolledWindow->ClearBackground();
 }
 
 void GUIMyFrame1::m_b_threshold_click( wxCommandEvent& event )
@@ -137,6 +146,7 @@ void GUIMyFrame1::m_b_threshold_click( wxCommandEvent& event )
         if(data[i]<128) data[i]=0;
         else data[i]=255;
     }
+    m_scrolledWindow->ClearBackground();
 }
 
 
@@ -146,12 +156,12 @@ void GUIMyFrame1::Contrast(int value)
     Img_Cpy = Img_Org.Copy();
     unsigned char* data = Img_Cpy.GetData();
     int size = Img_Cpy.GetWidth()*Img_Cpy.GetHeight()*3;
-    value = value*255/100;
-    value = (259*(value+255))/(255*(259-value));    
-
+    double value1 = value*255/100;
+    printf("%d", value);
+    value1 = (259*(value1+255))/(255*(259-value1));
     for(int i=0; i<size; i++)
     {
-        int tmp = value*(data[i]-128)+128;
+        int tmp = value1*(data[i]-128)+128;
         if(tmp<0) tmp=0;
         else if(tmp>255) tmp=255;
         data[i] = tmp;
@@ -160,6 +170,7 @@ void GUIMyFrame1::Contrast(int value)
 
 void GUIMyFrame1::Repaint()
 {
+//clear the window and draw the image
  wxBitmap bitmap(Img_Cpy);          // Tworzymy tymczasowa bitmape na podstawie Img_Cpy
  wxClientDC dc(m_scrolledWindow);   // Pobieramy kontekst okna
  m_scrolledWindow->DoPrepareDC(dc); // Musimy wywolac w przypadku wxScrolledWindow, zeby suwaki prawidlowo dzialaly
