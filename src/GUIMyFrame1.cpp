@@ -157,7 +157,6 @@ void GUIMyFrame1::Contrast(int value)
     unsigned char* data = Img_Cpy.GetData();
     int size = Img_Cpy.GetWidth()*Img_Cpy.GetHeight()*3;
     double value1 = value*255/100;
-    printf("%d", value);
     value1 = (259*(value1+255))/(255*(259-value1));
     for(int i=0; i<size; i++)
     {
