@@ -14,7 +14,7 @@ endif ()
 
 add_definitions(-DPROJECTPATH=\"${PROJECT_SOURCE_DIR}\")
 
-set(CMAKE_BUILD_TYPE Debug) #Release
+set(CMAKE_BUILD_TYPE release) #Release
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS_DEBUG_INIT "-Wall")
